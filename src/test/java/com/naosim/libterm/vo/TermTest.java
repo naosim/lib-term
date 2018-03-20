@@ -1,11 +1,11 @@
 package com.naosim.libterm.vo;
 
+import com.naosim.ddd.term.LocalDateVOImpl;
+import com.naosim.ddd.term.Term;
+import com.naosim.ddd.term.TermImpl;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
 
 public class TermTest {
 

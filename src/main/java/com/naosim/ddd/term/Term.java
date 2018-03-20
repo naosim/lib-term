@@ -1,4 +1,4 @@
-package com.naosim.libterm.vo;
+package com.naosim.ddd.term;
 
 import java.time.LocalDate;
 import java.util.Optional;

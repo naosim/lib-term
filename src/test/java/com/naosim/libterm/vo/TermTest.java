@@ -10,6 +10,8 @@ import java.time.YearMonth;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.naosim.libterm.vo.TestCase.c;
+
 public class TermTest {
 
     @Test
@@ -37,24 +39,24 @@ public class TermTest {
     public void isIncludeFirstDayOfMonth() {
         YearMonth targetYearMonth = YearMonth.of(2018, 1);
 
-        Object[][] list = {
-                { 1, 20170101, Optional.of(20171231), false },
-                { 2, 20170101, Optional.of(20180101), true },
-                { 3, 20180101, Optional.of(20180101), true },
-                { 4, 20180101, Optional.of(20180201), true },
-                { 5, 20180101, Optional.empty()     , true },
-                { 6, 20180102, Optional.empty()     , false },
-                { 7, 20180102, Optional.of(20180228), false },
+        TestCase[] list = {
+                c("1", 20170101, Optional.of(20171231), false),
+                c( "2", 20170101, Optional.of(20180101), true),
+                c( "3", 20180101, Optional.of(20180101), true),
+                c( "4", 20180101, Optional.of(20180201), true),
+                c( "5", 20180101, Optional.empty()     , true),
+                c( "6", 20180102, Optional.empty()     , false),
+                c( "7", 20180102, Optional.of(20180228), false)
         };
 
         Stream.of(list).forEach(c -> {
-            LocalDate start = intToLocalDate((int)c[1]);
-            Optional<LocalDate> end = Optional.class.cast(c[2]).map(v -> intToLocalDate((int)v));
+            LocalDate start = intToLocalDate(c.get(0));
+            Optional<LocalDate> end = c.get(1, Optional.class).map(v -> intToLocalDate((int)v));
             Term<LocalDateVOImpl, LocalDateVOImpl> sut = new TermImpl<>(
                     new LocalDateVOImpl(start),
                     end.map(LocalDateVOImpl::new)
             );
-            assert sut.getTermIncludeYearMonthJudge(targetYearMonth).isIncludeFirstDayOfMonth() == (boolean)c[3] : "" + c[0];
+            assert sut.getTermIncludeYearMonthJudge(targetYearMonth).isIncludeFirstDayOfMonth() == c.get(2, Boolean.class) : c.getCaseName();
         });
     }
 

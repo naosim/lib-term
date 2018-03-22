@@ -20,7 +20,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository url: "file://${rootDir}/docs"
-            pom.version = '0.1.0'
+            pom.version = '0.1.1'
             pom.groupId = 'com.naosim.ddd'
             pom.artifactId = 'libterm'
         }

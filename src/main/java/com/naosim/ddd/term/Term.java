@@ -20,7 +20,15 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
         return getEndDateOption().map(v -> !v.isBefore(date)).orElse(true);
     }
 
+    default boolean isInTerm(LocalDateVO date) {
+        return isInTerm(date.getValue());
+    }
+
     default boolean isOutOfTerm(LocalDate date) {
+        return !isInTerm(date);
+    }
+
+    default boolean isOutOfTerm(LocalDateVO date) {
         return !isInTerm(date);
     }
 
@@ -28,16 +36,35 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
         return getEndDateOption().isPresent();
     }
 
+    /**
+     * 少なくとも1日は重なる期間がある
+     * @param other
+     * @return
+     */
     default boolean isOverlapAtLeastOneDay(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
+        final LocalDate infinity = LocalDate.of(2999, 12, 31);
+
         LocalDate start = getStartDate().getValue();
-        LocalDate end = getEndDateOption().map(LocalDateVO::getValue).orElse(LocalDate.of(2999, 12, 31));
+        LocalDate end = getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
         LocalDate otherStart = other.getStartDate().getValue();
-        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(LocalDate.of(2999, 12, 31));
+        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
 
         LocalDate maxStart = max(start, otherStart);
         LocalDate minEnd = min(end, otherEnd);
 
         return maxStart.equals(minEnd) || maxStart.isBefore(minEnd);
+    }
+
+    /**
+     * 引数の全てを含んでいる
+     * @param other
+     * @return
+     */
+    default boolean containsFull(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
+        final LocalDate infinity = LocalDate.of(2999, 12, 31);
+        LocalDate otherStart = other.getStartDate().getValue();
+        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
+        return isInTerm(otherStart) && isInTerm(otherEnd);
     }
 
     default TermIncludeYearMonthJudge getTermIncludeYearMonthJudge(YearMonth targetYearMonth) {

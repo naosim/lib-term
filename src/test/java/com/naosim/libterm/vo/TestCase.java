@@ -1,5 +1,8 @@
 package com.naosim.libterm.vo;
 
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 public class TestCase {
     private final String caseName;
     private final Object[] args;
@@ -17,11 +20,15 @@ public class TestCase {
         return (T)args[index];
     }
 
-    public static TestCase c(String caseName, Object... args) {
-        return new TestCase(caseName, args);
-    }
-
     public String getCaseName() {
         return caseName;
+    }
+
+    public static void eachTest(Consumer<TestCase> forEach, TestCase... list) {
+        Stream.of(list).forEach(forEach);
+    }
+
+    public static TestCase c(String caseName, Object... args) {
+        return new TestCase(caseName, args);
     }
 }

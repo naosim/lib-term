@@ -32,7 +32,7 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
         LocalDate start = getStartDate().getValue();
         LocalDate end = getEndDateOption().map(LocalDateVO::getValue).orElse(LocalDate.of(2999, 12, 31));
         LocalDate otherStart = other.getStartDate().getValue();
-        LocalDate otherEnd = getEndDateOption().map(LocalDateVO::getValue).orElse(LocalDate.of(2999, 12, 31));
+        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(LocalDate.of(2999, 12, 31));
 
         LocalDate maxStart = max(start, otherStart);
         LocalDate minEnd = min(end, otherEnd);

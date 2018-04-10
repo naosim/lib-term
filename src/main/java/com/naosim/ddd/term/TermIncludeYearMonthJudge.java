@@ -32,7 +32,7 @@ public class TermIncludeYearMonthJudge {
      * @return
      */
     public boolean isIncludeEndOfMonth() {
-        return term.isInTerm(targetYearMonthTerm.getEndDateOption().get());
+        return term.isInTerm(targetYearMonthTerm.getEndDateTimeOptional().get());
     }
 
     /**

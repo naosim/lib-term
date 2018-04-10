@@ -22,7 +22,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
      * 終了日時の取得
      * @return
      */
-    Optional<E> getEndDateOption();
+    Optional<E> getEndDateTimeOptional();
 
     /**
      * dateが期間内かどうか
@@ -37,7 +37,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         if(this.getStartDateTime().isAfter(date)) {
             return false;
         }
-        return getEndDateOption().map(v -> !v.isBefore(date)).orElse(true);
+        return getEndDateTimeOptional().map(v -> !v.isBefore(date)).orElse(true);
     }
 
     /**
@@ -80,7 +80,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
     }
 
     default boolean hasEndDate() {
-        return getEndDateOption().isPresent();
+        return getEndDateTimeOptional().isPresent();
     }
 
     /**
@@ -92,9 +92,9 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
 
         LocalDateTime start = getStartDateTime().getValue();
-        LocalDateTime end = getEndDateOption().map(LocalDateTimeVO::getValue).orElse(infinity);
+        LocalDateTime end = getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
         LocalDateTime otherStart = other.getStartDateTime().getValue();
-        LocalDateTime otherEnd = other.getEndDateOption().map(LocalDateTimeVO::getValue).orElse(infinity);
+        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
         LocalDateTime maxStart = max(start, otherStart);
         LocalDateTime minEnd = min(end, otherEnd);
 
@@ -109,7 +109,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
     default boolean containsFull(Term<? extends LocalDateTimeVO, ? extends LocalDateTimeVO> other) {
         final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
         LocalDateTime otherStart = other.getStartDateTime().getValue();
-        LocalDateTime otherEnd = other.getEndDateOption().map(LocalDateTimeVO::getValue).orElse(infinity);
+        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
         return isInTerm(otherStart) && isInTerm(otherEnd);
     }
 

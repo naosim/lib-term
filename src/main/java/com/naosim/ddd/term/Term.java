@@ -1,39 +1,86 @@
 package com.naosim.ddd.term;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Optional;
 
 /**
  * 期間
- * @param <S> 開始日
- * @param <E> 終了日
+ * 開始日時と終了日時を持つクラス
+ * 終了日時がない場合、終了日時は無限として処理をする
+ * @param <S> 開始日時
+ * @param <E> 終了日時
  */
-public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
-    S getStartDate();
-    Optional<E> getEndDateOption();
+public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
+    /**
+     * 開始日時の取得
+     * @return
+     */
+    S getStartDateTime();
 
-    default boolean isInTerm(LocalDate date) {
-        if(this.getStartDate().isAfter(date)) {
+    /**
+     * 終了日時の取得
+     * @return
+     */
+    Optional<E> getEndDateTimeOptional();
+
+    /**
+     * dateが期間内かどうか
+     *
+     * 終了日時がある場合: 開始日時 <= date < 終了日時
+     * 終了日時がない場合: 開始日時 <= date
+     *
+     * @param date
+     * @return
+     */
+    default boolean isInTerm(LocalDateTime date) {
+        if(this.getStartDateTime().isAfter(date)) {
             return false;
         }
-        return getEndDateOption().map(v -> !v.isBefore(date)).orElse(true);
+        return getEndDateTimeOptional().map(v -> !v.isBefore(date)).orElse(true);
     }
 
-    default boolean isInTerm(LocalDateVO date) {
+    /**
+     * dateが期間内かどうか
+     *
+     * 終了日時がある場合: 開始日時 <= date < 終了日時
+     * 終了日時がない場合: 開始日時 <= date
+     *
+     * @param date
+     * @return
+     */
+    default boolean isInTerm(LocalDateTimeVO date) {
         return isInTerm(date.getValue());
     }
 
-    default boolean isOutOfTerm(LocalDate date) {
+    /**
+     * dateが期間外かどうか
+     *
+     * 終了日時がある場合: date < 開始日時 or 終了日時 <= date
+     * 終了日時がない場合: date < 開始日時
+     *
+     * @param date
+     * @return
+     */
+    default boolean isOutOfTerm(LocalDateTime date) {
         return !isInTerm(date);
     }
 
-    default boolean isOutOfTerm(LocalDateVO date) {
+    /**
+     * dateが期間外かどうか
+     *
+     * 終了日時がある場合: date < 開始日時 or 終了日時 <= date
+     * 終了日時がない場合: date < 開始日時
+     *
+     * @param date
+     * @return
+     */
+    default boolean isOutOfTerm(LocalDateTimeVO date) {
         return !isInTerm(date);
     }
 
     default boolean hasEndDate() {
-        return getEndDateOption().isPresent();
+        return getEndDateTimeOptional().isPresent();
     }
 
     /**
@@ -41,16 +88,15 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
      * @param other
      * @return
      */
-    default boolean isOverlapAtLeastOneDay(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
-        final LocalDate infinity = LocalDate.of(2999, 12, 31);
+    default boolean isOverlapAtLeastOneDay(Term<? extends LocalDateTimeVO, ? extends LocalDateTimeVO> other) {
+        final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
 
-        LocalDate start = getStartDate().getValue();
-        LocalDate end = getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
-        LocalDate otherStart = other.getStartDate().getValue();
-        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
-
-        LocalDate maxStart = max(start, otherStart);
-        LocalDate minEnd = min(end, otherEnd);
+        LocalDateTime start = getStartDateTime().getValue();
+        LocalDateTime end = getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
+        LocalDateTime otherStart = other.getStartDateTime().getValue();
+        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
+        LocalDateTime maxStart = max(start, otherStart);
+        LocalDateTime minEnd = min(end, otherEnd);
 
         return maxStart.equals(minEnd) || maxStart.isBefore(minEnd);
     }
@@ -60,10 +106,10 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
      * @param other
      * @return
      */
-    default boolean containsFull(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
-        final LocalDate infinity = LocalDate.of(2999, 12, 31);
-        LocalDate otherStart = other.getStartDate().getValue();
-        LocalDate otherEnd = other.getEndDateOption().map(LocalDateVO::getValue).orElse(infinity);
+    default boolean containsFull(Term<? extends LocalDateTimeVO, ? extends LocalDateTimeVO> other) {
+        final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
+        LocalDateTime otherStart = other.getStartDateTime().getValue();
+        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
         return isInTerm(otherStart) && isInTerm(otherEnd);
     }
 
@@ -71,11 +117,11 @@ public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
         return new TermIncludeYearMonthJudge(this, targetYearMonth);
     }
 
-    static LocalDate max(LocalDate a, LocalDate b) {
+    static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
         return a.isAfter(b) ? a : b;
     }
 
-    static LocalDate min(LocalDate a, LocalDate b) {
+    static LocalDateTime min(LocalDateTime a, LocalDateTime b) {
         return a.isBefore(b) ? a : b;
     }
 }

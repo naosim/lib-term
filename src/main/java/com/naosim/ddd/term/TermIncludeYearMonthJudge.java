@@ -1,6 +1,5 @@
 package com.naosim.ddd.term;
 
-import java.time.LocalDate;
 import java.time.YearMonth;
 
 /**
@@ -9,14 +8,14 @@ import java.time.YearMonth;
 public class TermIncludeYearMonthJudge {
     private final Term term;
     private final YearMonth targetYearMonth;
-    private final Term<LocalDateVO, LocalDateVO> targetYearMonthTerm;
+    private final Term<LocalDateTimeVO, LocalDateTimeVO> targetYearMonthTerm;
 
     public TermIncludeYearMonthJudge(Term term, YearMonth targetYearMonth) {
         this.term = term;
         this.targetYearMonth = targetYearMonth;
         this.targetYearMonthTerm = new TermImpl<>(
-                new LocalDateVOImpl(targetYearMonth.atDay(1)),
-                new LocalDateVOImpl(targetYearMonth.atEndOfMonth())
+                new LocalDateTimeVOImpl(targetYearMonth.atDay(1)),
+                new LocalDateTimeVOImpl(targetYearMonth.atEndOfMonth())
         );
     }
 
@@ -25,7 +24,7 @@ public class TermIncludeYearMonthJudge {
      * @return
      */
     public boolean isIncludeFirstDayOfMonth() {
-        return term.isInTerm(targetYearMonthTerm.getStartDate());
+        return term.isInTerm(targetYearMonthTerm.getStartDateTime());
     }
 
     /**

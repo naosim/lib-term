@@ -3,6 +3,8 @@ package com.naosim.ddd.term;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * 期間
@@ -79,7 +81,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         return !isInTerm(date);
     }
 
-    default boolean hasEndDate() {
+    default boolean hasEndDateTime() {
         return getEndDateTimeOptional().isPresent();
     }
 
@@ -113,6 +115,36 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         return isInTerm(otherStart) && isInTerm(otherEnd);
     }
 
+    /**
+     * 終了日時の有無で分岐する(戻り値あり)
+     * @param onlyStart
+     * @param startAndEnd
+     * @param <T>
+     * @return
+     */
+    default <T> T mapIfOnlyStart(
+            Function<TermOnlyStart<S, E>, T> onlyStart,
+            Function<TermStartAndEnd<S, E>, T> startAndEnd
+    ) {
+        return hasEndDateTime() ? startAndEnd.apply(new TermStartAndEnd<>(getStartDateTime(), getEndDateTimeOptional().get())) : onlyStart.apply(new TermOnlyStart<>(getStartDateTime()));
+    }
+
+    /**
+     * 終了日の有無で分岐する
+     * @param onlyStart
+     * @param startAndEnd
+     */
+    default void ifOnlyStart(
+            Consumer<TermOnlyStart<S, E>> onlyStart,
+            Consumer<TermStartAndEnd<S, E>> startAndEnd
+    ) {
+        if(hasEndDateTime()) {
+            startAndEnd.accept(new TermStartAndEnd<>(getStartDateTime(), getEndDateTimeOptional().get()));
+        } else {
+            onlyStart.accept(new TermOnlyStart<>(getStartDateTime()));
+        }
+    }
+
     default TermIncludeYearMonthJudge getTermIncludeYearMonthJudge(YearMonth targetYearMonth) {
         return new TermIncludeYearMonthJudge(this, targetYearMonth);
     }
@@ -123,5 +155,19 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
 
     static LocalDateTime min(LocalDateTime a, LocalDateTime b) {
         return a.isBefore(b) ? a : b;
+    }
+
+    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime, Optional<E> endDateTimeOptional) {
+        return endDateTimeOptional
+                .<Term<S, E>>map(end -> new TermStartAndEnd<>(startDateTime, end))
+                .orElseGet(() -> new TermOnlyStart<>(startDateTime));
+    }
+
+    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime) {
+        return new TermOnlyStart<>(startDateTime);
+    }
+
+    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime, E endDateTime) {
+        return new TermStartAndEnd<>(startDateTime, endDateTime);
     }
 }

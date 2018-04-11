@@ -2,7 +2,6 @@ package com.naosim.libterm.vo;
 
 import com.naosim.ddd.term.LocalDateTimeVOImpl;
 import com.naosim.ddd.term.Term;
-import com.naosim.ddd.term.TermImpl;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
@@ -10,6 +9,7 @@ import java.time.YearMonth;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.naosim.ddd.term.Term.termOf;
 import static com.naosim.libterm.vo.TestCase.c;
 import static com.naosim.libterm.vo.TestCase.eachTest;
 
@@ -21,7 +21,7 @@ public class TermTest {
                 c -> {
                     LocalDateTimeVOImpl start = date(20180201);
                     LocalDateTimeVOImpl end = date(20180228);
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = new TermImpl<>(start, end);
+                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(start, end);
 
                     assert sut.isInTerm(intToLocalDateTime(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
                 },
@@ -36,7 +36,7 @@ public class TermTest {
     public void isInTerm_endNotExists() {
         eachTest(
                 c -> {
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = new TermImpl<>(date(20180201));
+                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(date(20180201));
                     assert sut.isInTerm(intToLocalDateTime(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
                 },
                 c("前", 20180131, false),
@@ -51,7 +51,7 @@ public class TermTest {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
                     LocalDateTime start = intToLocalDateTime(c.get(0));
                     Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = new TermImpl<>(
+                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
                             new LocalDateTimeVOImpl(start),
                             end.map(LocalDateTimeVOImpl::new)
                     );
@@ -74,7 +74,7 @@ public class TermTest {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
                     LocalDateTime start = intToLocalDateTime(c.get(0));
                     Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = new TermImpl<>(
+                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
                             new LocalDateTimeVOImpl(start),
                             end.map(LocalDateTimeVOImpl::new)
                     );
@@ -98,7 +98,7 @@ public class TermTest {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
                     LocalDateTime start = intToLocalDateTime(c.get(0));
                     Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = new TermImpl<>(
+                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
                             new LocalDateTimeVOImpl(start),
                             end.map(LocalDateTimeVOImpl::new)
                     );

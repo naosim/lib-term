@@ -79,7 +79,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         return !isInTerm(date);
     }
 
-    default boolean hasEndDate() {
+    default boolean hasEndDateTime() {
         return getEndDateTimeOptional().isPresent();
     }
 

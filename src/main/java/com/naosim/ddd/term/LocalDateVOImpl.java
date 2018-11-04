@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class LocalDateTimeVOImpl implements LocalDateTimeVO {
+public class LocalDateVOImpl implements LocalDateVO {
     @Getter
-    private final LocalDateTime value;
-    public LocalDateTimeVOImpl(LocalDate value) {
-        this.value = value.atTime(0, 0);
+    private final LocalDate value;
+    public LocalDateVOImpl(LocalDateTime value) {
+        this.value = value.toLocalDate();
     }
 }

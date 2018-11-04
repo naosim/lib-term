@@ -1,5 +1,5 @@
 group 'com.naosim.ddd'
-version '1.0-SNAPSHOT'
+version '0.4.0'
 
 apply plugin: 'groovy'
 apply plugin: 'java'
@@ -22,7 +22,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository url: "file://${rootDir}/docs"
-            pom.version = '0.3.0'
+            pom.version = version
             pom.groupId = 'com.naosim.ddd'
             pom.artifactId = 'libterm'
         }

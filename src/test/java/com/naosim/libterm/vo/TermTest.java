@@ -1,10 +1,10 @@
 package com.naosim.libterm.vo;
 
-import com.naosim.ddd.term.LocalDateTimeVOImpl;
+import com.naosim.ddd.term.LocalDateVOImpl;
 import com.naosim.ddd.term.Term;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
 import java.util.function.Function;
@@ -19,11 +19,11 @@ public class TermTest {
     public void isInTerm() {
         eachTest(
                 c -> {
-                    LocalDateTimeVOImpl start = date(20180201);
-                    LocalDateTimeVOImpl end = date(20180228);
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(start, end);
+                    LocalDateVOImpl start = date(20180201);
+                    LocalDateVOImpl end = date(20180228);
+                    Term<LocalDateVOImpl, LocalDateVOImpl> sut = termOf(start, end);
 
-                    assert sut.isInTerm(intToLocalDateTime(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
+                    assert sut.isInTerm(intToLocalDate(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
                 },
                 c("前" , 20180131, false),
                 c("内1", 20180201, true),
@@ -36,8 +36,8 @@ public class TermTest {
     public void isInTerm_endNotExists() {
         eachTest(
                 c -> {
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(date(20180201));
-                    assert sut.isInTerm(intToLocalDateTime(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
+                    Term<LocalDateVOImpl, LocalDateVOImpl> sut = termOf(date(20180201));
+                    assert sut.isInTerm(intToLocalDate(c.get(0))) == (boolean)c.get(1) : c.getCaseName();
                 },
                 c("前", 20180131, false),
                 c("内", 20180201, true)
@@ -49,11 +49,11 @@ public class TermTest {
         eachTest(
                 c -> {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
-                    LocalDateTime start = intToLocalDateTime(c.get(0));
-                    Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
-                            new LocalDateTimeVOImpl(start),
-                            end.map(LocalDateTimeVOImpl::new)
+                    LocalDate start = intToLocalDate(c.get(0));
+                    Optional<LocalDate> end = c.get(1, Optional.class).map(v -> intToLocalDate((int)v));
+                    Term<LocalDateVOImpl, LocalDateVOImpl> sut = termOf(
+                            new LocalDateVOImpl(start),
+                            end.map(LocalDateVOImpl::new)
                     );
                     assert sut.getTermIncludeYearMonthJudge(targetYearMonth).isIncludeFirstDayOfMonth() == c.get(2, Boolean.class) : c.getCaseName();
                 },
@@ -72,11 +72,11 @@ public class TermTest {
         eachTest(
                 c -> {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
-                    LocalDateTime start = intToLocalDateTime(c.get(0));
-                    Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
-                            new LocalDateTimeVOImpl(start),
-                            end.map(LocalDateTimeVOImpl::new)
+                    LocalDate start = intToLocalDate(c.get(0));
+                    Optional<LocalDate> end = c.get(1, Optional.class).map(v -> intToLocalDate((int)v));
+                    Term<LocalDateVOImpl, LocalDateVOImpl> sut = termOf(
+                            new LocalDateVOImpl(start),
+                            end.map(LocalDateVOImpl::new)
                     );
                     assert sut.getTermIncludeYearMonthJudge(targetYearMonth).isIncludeFullMonth() == c.get(2, Boolean.class) : c.getCaseName();
                 },
@@ -96,11 +96,11 @@ public class TermTest {
         eachTest(
                 c -> {
                     YearMonth targetYearMonth = YearMonth.of(2018, 1);
-                    LocalDateTime start = intToLocalDateTime(c.get(0));
-                    Optional<LocalDateTime> end = c.get(1, Optional.class).map(v -> intToLocalDateTime((int)v));
-                    Term<LocalDateTimeVOImpl, LocalDateTimeVOImpl> sut = termOf(
-                            new LocalDateTimeVOImpl(start),
-                            end.map(LocalDateTimeVOImpl::new)
+                    LocalDate start = intToLocalDate(c.get(0));
+                    Optional<LocalDate> end = c.get(1, Optional.class).map(v -> intToLocalDate((int)v));
+                    Term<LocalDateVOImpl, LocalDateVOImpl> sut = termOf(
+                            new LocalDateVOImpl(start),
+                            end.map(LocalDateVOImpl::new)
                     );
                     assert sut.getTermIncludeYearMonthJudge(targetYearMonth).isIncludeAtLeastOneDayOfMonth() == c.get(2, Boolean.class) : c.getCaseName();
                 },
@@ -115,28 +115,28 @@ public class TermTest {
     }
 
     /**
-     * Create LocalDateTime From integer like 20180301
+     * Create LocalDate From integer like 20180301
      * @param value
      * @return
      */
-    static final LocalDateTime intToLocalDateTime(int value) {
+    static final LocalDate intToLocalDate(int value) {
         String str = "" + value;
         int year = Integer.valueOf(str.substring(0, 4));
         int month = Integer.valueOf(str.substring(4, 6));
         int dayOfMonth = Integer.valueOf(str.substring(6, 8));
-        return LocalDateTime.of(year, month, dayOfMonth, 0, 0);
+        return LocalDate.of(year, month, dayOfMonth);
     }
 
     /**
-     * Create LocalDateTime From integer like 20180301
+     * Create LocalDate From integer like 20180301
      * @param value
      * @return
      */
-    static final <T> T intToLocalDateTime(int value, Function<LocalDateTime, T> factory) {
-        return factory.apply(intToLocalDateTime(value));
+    static final <T> T intToLocalDate(int value, Function<LocalDate, T> factory) {
+        return factory.apply(intToLocalDate(value));
     }
 
-    static LocalDateTimeVOImpl date(int yyyymmdd) {
-        return intToLocalDateTime(yyyymmdd, LocalDateTimeVOImpl::new);
+    static LocalDateVOImpl date(int yyyymmdd) {
+        return intToLocalDate(yyyymmdd, LocalDateVOImpl::new);
     }
 }

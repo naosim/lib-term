@@ -1,6 +1,6 @@
 package com.naosim.ddd.term;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -8,81 +8,81 @@ import java.util.function.Function;
 
 /**
  * 期間
- * 開始日時と終了日時を持つクラス
- * 終了日時がない場合、終了日時は無限として処理をする
- * @param <S> 開始日時
- * @param <E> 終了日時
+ * 開始日と終了日を持つクラス
+ * 終了日がない場合、終了日は無限として処理をする
+ * @param <S> 開始日
+ * @param <E> 終了日
  */
-public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
+public interface Term<S extends LocalDateVO, E extends LocalDateVO> {
     /**
-     * 開始日時の取得
+     * 開始日の取得
      * @return
      */
-    S getStartDateTime();
+    S getStartDate();
 
     /**
-     * 終了日時の取得
+     * 終了日の取得
      * @return
      */
-    Optional<E> getEndDateTimeOptional();
+    Optional<E> getEndDateOptional();
 
     /**
      * dateが期間内かどうか
      *
-     * 終了日時がある場合: 開始日時 <= date < 終了日時
-     * 終了日時がない場合: 開始日時 <= date
+     * 終了日がある場合: 開始日 <= date < 終了日
+     * 終了日がない場合: 開始日 <= date
      *
      * @param date
      * @return
      */
-    default boolean isInTerm(LocalDateTime date) {
-        if(this.getStartDateTime().isAfter(date)) {
+    default boolean isInTerm(LocalDate date) {
+        if(this.getStartDate().isAfter(date)) {
             return false;
         }
-        return getEndDateTimeOptional().map(v -> !v.isBefore(date)).orElse(true);
+        return getEndDateOptional().map(v -> !v.isBefore(date)).orElse(true);
     }
 
     /**
      * dateが期間内かどうか
      *
-     * 終了日時がある場合: 開始日時 <= date < 終了日時
-     * 終了日時がない場合: 開始日時 <= date
+     * 終了日がある場合: 開始日 <= date < 終了日
+     * 終了日がない場合: 開始日 <= date
      *
      * @param date
      * @return
      */
-    default boolean isInTerm(LocalDateTimeVO date) {
+    default boolean isInTerm(LocalDateVO date) {
         return isInTerm(date.getValue());
     }
 
     /**
      * dateが期間外かどうか
      *
-     * 終了日時がある場合: date < 開始日時 or 終了日時 <= date
-     * 終了日時がない場合: date < 開始日時
+     * 終了日がある場合: date < 開始日 or 終了日 <= date
+     * 終了日がない場合: date < 開始日
      *
      * @param date
      * @return
      */
-    default boolean isOutOfTerm(LocalDateTime date) {
+    default boolean isOutOfTerm(LocalDate date) {
         return !isInTerm(date);
     }
 
     /**
      * dateが期間外かどうか
      *
-     * 終了日時がある場合: date < 開始日時 or 終了日時 <= date
-     * 終了日時がない場合: date < 開始日時
+     * 終了日がある場合: date < 開始日 or 終了日 <= date
+     * 終了日がない場合: date < 開始日
      *
      * @param date
      * @return
      */
-    default boolean isOutOfTerm(LocalDateTimeVO date) {
+    default boolean isOutOfTerm(LocalDateVO date) {
         return !isInTerm(date);
     }
 
-    default boolean hasEndDateTime() {
-        return getEndDateTimeOptional().isPresent();
+    default boolean hasEndDate() {
+        return getEndDateOptional().isPresent();
     }
 
     /**
@@ -90,15 +90,15 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
      * @param other
      * @return
      */
-    default boolean isOverlapAtLeastOneDay(Term<? extends LocalDateTimeVO, ? extends LocalDateTimeVO> other) {
-        final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
+    default boolean isOverlapAtLeastOneDay(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
+        final LocalDate infinity = LocalDate.of(2999, 12, 31);
 
-        LocalDateTime start = getStartDateTime().getValue();
-        LocalDateTime end = getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
-        LocalDateTime otherStart = other.getStartDateTime().getValue();
-        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
-        LocalDateTime maxStart = max(start, otherStart);
-        LocalDateTime minEnd = min(end, otherEnd);
+        LocalDate start = getStartDate().getValue();
+        LocalDate end = getEndDateOptional().map(LocalDateVO::getValue).orElse(infinity);
+        LocalDate otherStart = other.getStartDate().getValue();
+        LocalDate otherEnd = other.getEndDateOptional().map(LocalDateVO::getValue).orElse(infinity);
+        LocalDate maxStart = max(start, otherStart);
+        LocalDate minEnd = min(end, otherEnd);
 
         return maxStart.equals(minEnd) || maxStart.isBefore(minEnd);
     }
@@ -108,15 +108,15 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
      * @param other
      * @return
      */
-    default boolean containsFull(Term<? extends LocalDateTimeVO, ? extends LocalDateTimeVO> other) {
-        final LocalDateTime infinity = LocalDateTime.of(2999, 12, 31, 23, 59, 59);
-        LocalDateTime otherStart = other.getStartDateTime().getValue();
-        LocalDateTime otherEnd = other.getEndDateTimeOptional().map(LocalDateTimeVO::getValue).orElse(infinity);
+    default boolean containsFull(Term<? extends LocalDateVO, ? extends LocalDateVO> other) {
+        final LocalDate infinity = LocalDate.of(2999, 12, 31);
+        LocalDate otherStart = other.getStartDate().getValue();
+        LocalDate otherEnd = other.getEndDateOptional().map(LocalDateVO::getValue).orElse(infinity);
         return isInTerm(otherStart) && isInTerm(otherEnd);
     }
 
     /**
-     * 終了日時の有無で分岐する(戻り値あり)
+     * 終了日の有無で分岐する(戻り値あり)
      * @param onlyStart
      * @param startAndEnd
      * @param <T>
@@ -126,7 +126,7 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
             Function<TermOnlyStart<S, E>, T> onlyStart,
             Function<TermStartAndEnd<S, E>, T> startAndEnd
     ) {
-        return hasEndDateTime() ? startAndEnd.apply(new TermStartAndEnd<>(getStartDateTime(), getEndDateTimeOptional().get())) : onlyStart.apply(new TermOnlyStart<>(getStartDateTime()));
+        return hasEndDate() ? startAndEnd.apply(new TermStartAndEnd<>(getStartDate(), getEndDateOptional().get())) : onlyStart.apply(new TermOnlyStart<>(getStartDate()));
     }
 
     /**
@@ -138,10 +138,10 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
             Consumer<TermOnlyStart<S, E>> onlyStart,
             Consumer<TermStartAndEnd<S, E>> startAndEnd
     ) {
-        if(hasEndDateTime()) {
-            startAndEnd.accept(new TermStartAndEnd<>(getStartDateTime(), getEndDateTimeOptional().get()));
+        if(hasEndDate()) {
+            startAndEnd.accept(new TermStartAndEnd<>(getStartDate(), getEndDateOptional().get()));
         } else {
-            onlyStart.accept(new TermOnlyStart<>(getStartDateTime()));
+            onlyStart.accept(new TermOnlyStart<>(getStartDate()));
         }
     }
 
@@ -149,25 +149,25 @@ public interface Term<S extends LocalDateTimeVO, E extends LocalDateTimeVO> {
         return new TermIncludeYearMonthJudge(this, targetYearMonth);
     }
 
-    static LocalDateTime max(LocalDateTime a, LocalDateTime b) {
+    static LocalDate max(LocalDate a, LocalDate b) {
         return a.isAfter(b) ? a : b;
     }
 
-    static LocalDateTime min(LocalDateTime a, LocalDateTime b) {
+    static LocalDate min(LocalDate a, LocalDate b) {
         return a.isBefore(b) ? a : b;
     }
 
-    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime, Optional<E> endDateTimeOptional) {
-        return endDateTimeOptional
-                .<Term<S, E>>map(end -> new TermStartAndEnd<>(startDateTime, end))
-                .orElseGet(() -> new TermOnlyStart<>(startDateTime));
+    static <S extends LocalDateVO, E extends LocalDateVO> Term<S, E> termOf(S startDate, Optional<E> endDateOptional) {
+        return endDateOptional
+                .<Term<S, E>>map(end -> new TermStartAndEnd<>(startDate, end))
+                .orElseGet(() -> new TermOnlyStart<>(startDate));
     }
 
-    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime) {
-        return new TermOnlyStart<>(startDateTime);
+    static <S extends LocalDateVO, E extends LocalDateVO> Term<S, E> termOf(S startDate) {
+        return new TermOnlyStart<>(startDate);
     }
 
-    static <S extends LocalDateTimeVO, E extends LocalDateTimeVO> Term<S, E> termOf(S startDateTime, E endDateTime) {
-        return new TermStartAndEnd<>(startDateTime, endDateTime);
+    static <S extends LocalDateVO, E extends LocalDateVO> Term<S, E> termOf(S startDate, E endDate) {
+        return new TermStartAndEnd<>(startDate, endDate);
     }
 }

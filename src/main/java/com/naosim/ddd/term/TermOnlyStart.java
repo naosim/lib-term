@@ -1,19 +1,18 @@
 package com.naosim.ddd.term;
 
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Optional;
 
 @EqualsAndHashCode
-public class TermOnlyStart<S extends LocalDateTimeVO, E extends LocalDateTimeVO> implements Term<S, E> {
+public class TermOnlyStart<S extends LocalDateVO, E extends LocalDateVO> implements Term<S, E> {
     @Getter
-    private final S startDateTime;
+    private final S startDate;
     @Getter
-    private final Optional<E> endDateTimeOptional = Optional.empty();
+    private final Optional<E> endDateOptional = Optional.empty();
 
-    public TermOnlyStart(S startDateTime) {
-        this.startDateTime = startDateTime;
+    public TermOnlyStart(S startDate) {
+        this.startDate = startDate;
     }
 }

@@ -6,18 +6,18 @@ import lombok.Getter;
 import java.util.Optional;
 
 @EqualsAndHashCode
-public class TermStartAndEnd<S extends LocalDateTimeVO, E extends LocalDateTimeVO> implements Term<S, E> {
+public class TermStartAndEnd<S extends LocalDateVO, E extends LocalDateVO> implements Term<S, E> {
     @Getter
-    private final S startDateTime;
+    private final S startDate;
     @Getter
-    private final Optional<E> endDateTimeOptional;
+    private final Optional<E> endDateOptional;
 
-    public TermStartAndEnd(S startDateTime, E endDate) {
-        this.startDateTime = startDateTime;
-        this.endDateTimeOptional = Optional.of(endDate);
+    public TermStartAndEnd(S startDate, E endDate) {
+        this.startDate = startDate;
+        this.endDateOptional = Optional.of(endDate);
     }
 
-    public E getEndDateTime() {
-        return endDateTimeOptional.get();
+    public E getEndDate() {
+        return endDateOptional.get();
     }
 }

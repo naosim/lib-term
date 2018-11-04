@@ -8,14 +8,14 @@ import java.time.YearMonth;
 public class TermIncludeYearMonthJudge {
     private final Term term;
     private final YearMonth targetYearMonth;
-    private final TermStartAndEnd<LocalDateTimeVO, LocalDateTimeVO> targetYearMonthTerm;
+    private final TermStartAndEnd<LocalDateVO, LocalDateVO> targetYearMonthTerm;
 
     public TermIncludeYearMonthJudge(Term term, YearMonth targetYearMonth) {
         this.term = term;
         this.targetYearMonth = targetYearMonth;
         this.targetYearMonthTerm = new TermStartAndEnd<>(
-                new LocalDateTimeVOImpl(targetYearMonth.atDay(1)),
-                new LocalDateTimeVOImpl(targetYearMonth.atEndOfMonth())
+                new LocalDateVOImpl(targetYearMonth.atDay(1)),
+                new LocalDateVOImpl(targetYearMonth.atEndOfMonth())
         );
     }
 
@@ -24,7 +24,7 @@ public class TermIncludeYearMonthJudge {
      * @return
      */
     public boolean isIncludeFirstDayOfMonth() {
-        return term.isInTerm(targetYearMonthTerm.getStartDateTime());
+        return term.isInTerm(targetYearMonthTerm.getStartDate());
     }
 
     /**
@@ -32,7 +32,7 @@ public class TermIncludeYearMonthJudge {
      * @return
      */
     public boolean isIncludeEndOfMonth() {
-        return term.isInTerm(targetYearMonthTerm.getEndDateTime());
+        return term.isInTerm(targetYearMonthTerm.getEndDate());
     }
 
     /**
